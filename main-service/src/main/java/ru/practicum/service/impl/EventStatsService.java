@@ -40,7 +40,7 @@ public class EventStatsService {
                 .map(id -> "/events/" + id)
                 .toList();
 
-        List<ViewStatsDto> stats = statsClient.getStats(START_DATE, LocalDateTime.now(), uris, false);
+        List<ViewStatsDto> stats = statsClient.getStats(START_DATE, LocalDateTime.now(), uris, true);
         Map<Long, Long> views = new HashMap<>();
         for (ViewStatsDto stat : stats) {
             Long eventId = parseEventId(stat.uri());

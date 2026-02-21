@@ -21,6 +21,7 @@ import ru.practicum.repository.UserRepository;
 import ru.practicum.service.ParticipationRequestService;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +77,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
         ParticipationRequest request = ParticipationRequest
                 .builder()
-                .created(LocalDateTime.now())
+                .created(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
                 .event(event)
                 .requester(requester)
                 .status(status)
@@ -127,7 +128,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
         for (ParticipationRequest current : requests) {
             if (current.getStatus() != ParticipationRequestStatus.PENDING) {
-                throw new BadRequestException("Request must have status PENDING");
+                throw new ConflictException("Request must have status PENDING");
             }
         }
 

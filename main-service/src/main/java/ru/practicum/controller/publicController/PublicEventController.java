@@ -39,11 +39,19 @@ public class PublicEventController {
             @RequestParam(defaultValue = "10") @Positive int size,
             HttpServletRequest request) {
         return eventService.searchPublicEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from,
-                size, request.getRemoteAddr(), request.getRequestURI());
+                size, extractClientIp(request), request.getRequestURI());
     }
 
     @GetMapping("/{id}")
     public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
-        return eventService.getPublicEvent(id, request.getRemoteAddr(), request.getRequestURI());
+        return eventService.getPublicEvent(id, extractClientIp(request), request.getRequestURI());
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor == null || forwardedFor.isBlank()) {
+            return request.getRemoteAddr();
+        }
+        return forwardedFor.split(",")[0].trim();
     }
 }
