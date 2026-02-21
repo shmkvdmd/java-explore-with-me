@@ -1,9 +1,9 @@
 services:
   ewm-service:
+    restart: on-failure
     build:
       context: ./main-service
       dockerfile: Dockerfile
-    image: main-service-image
     container_name: ewm-service
     ports:
       - "8080:8080"
@@ -16,6 +16,11 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main
       - SPRING_DATASOURCE_USERNAME=main
       - SPRING_DATASOURCE_PASSWORD=main
+      - DB_HOST=main-db
+      - DB_PORT=5432
+      - DB_NAME=main
+      - POSTGRES_USER=main
+      - POSTGRES_PASSWORD=main
       - STATS_SERVER_URL=http://stats-server:9090
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
@@ -24,10 +29,10 @@ services:
       retries: 3
 
   stats-server:
+    restart: on-failure
     build:
       context: ./stats-service/server
       dockerfile: Dockerfile
-    image: stats-server-image
     container_name: stats-server
     ports:
       - "9090:9090"

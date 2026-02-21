@@ -1,5 +1,6 @@
 server:
   port: 8080
+  address: 0.0.0.0
 
 spring:
   jpa:
@@ -17,14 +18,18 @@ spring:
       date-time: yyyy-MM-dd HH:mm:ss
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:main-db}:${DB_PORT:5432}/${DB_NAME:main}}
+    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:main}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:main}}
 
 stats-server:
   url: ${STATS_SERVER_URL:http://stats-server:9090}
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
   endpoints:
     web:
       exposure:
