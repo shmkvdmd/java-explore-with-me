@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class Client {
+public class StatsClient {
     private final RestTemplate restTemplate;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public Client(@Value("${stats-server.url}") String serverUrl) {
+    public StatsClient(@Value("${stats-server.url}") String serverUrl) {
         this.restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
