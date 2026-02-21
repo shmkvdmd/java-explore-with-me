@@ -10,25 +10,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.EndpointHitDto;
 import ru.practicum.stats.dto.ViewStatsDto;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class StatsClient {
     private final RestTemplate restTemplate;
+    private final String serverUrl;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(@Value("${stats-server.url}") String serverUrl) {
+        this.serverUrl = serverUrl;
         this.restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
                 .build();
     }
@@ -37,31 +36,30 @@ public class StatsClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<EndpointHitDto> request = new HttpEntity<>(hitDto, headers);
-        restTemplate.exchange("/hit", HttpMethod.POST, request, Void.class);
+        URI uri = UriComponentsBuilder.fromUriString(serverUrl)
+                .path("/hit")
+                .build()
+                .toUri();
+        restTemplate.exchange(uri, HttpMethod.POST, request, Void.class);
     }
 
     public List<ViewStatsDto> getStats(LocalDateTime start,
                                        LocalDateTime end,
                                        @Nullable List<String> uris,
                                        boolean unique) {
-        String encodedStart = URLEncoder.encode(start.format(FORMATTER), StandardCharsets.UTF_8);
-        String encodedEnd = URLEncoder.encode(end.format(FORMATTER), StandardCharsets.UTF_8);
-
-        Map<String, Object> parameters = Map.of(
-                "start", encodedStart,
-                "end", encodedEnd,
-                "unique", unique
-        );
-
-        StringBuilder path = new StringBuilder("/stats?start={start}&end={end}&unique={unique}");
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUriString(serverUrl)
+                .path("/stats")
+                .queryParam("start", start.format(FORMATTER))
+                .queryParam("end", end.format(FORMATTER))
+                .queryParam("unique", unique);
 
         if (uris != null && !uris.isEmpty()) {
-            for (String uri : uris) {
-                path.append("&uris=").append(URLEncoder.encode(uri, StandardCharsets.UTF_8));
-            }
+            builder.queryParam("uris", uris.toArray());
         }
 
-        ViewStatsDto[] response = restTemplate.getForObject(path.toString(), ViewStatsDto[].class, parameters);
+        URI uri = builder.build().encode().toUri();
+        ViewStatsDto[] response = restTemplate.getForObject(uri, ViewStatsDto[].class);
 
         return response != null ? List.of(response) : List.of();
     }

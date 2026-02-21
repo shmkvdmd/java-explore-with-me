@@ -1,8 +1,11 @@
 package ru.practicum.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
@@ -22,14 +25,17 @@ public record NewEventDto(
         String description,
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @Future
         @NotNull
         LocalDateTime eventDate,
 
+        @Valid
         @NotNull
         LocationDto location,
 
         Boolean paid,
 
+        @PositiveOrZero
         Integer participantLimit,
 
         Boolean requestModeration,

@@ -4,10 +4,13 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.practicum.dto.ApiError;
@@ -38,6 +41,9 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class,
             ConstraintViolationException.class,
+            MissingServletRequestParameterException.class,
+            HttpMessageNotReadableException.class,
+            HandlerMethodValidationException.class,
             IllegalArgumentException.class})
     public ResponseEntity<ApiError> handleBadRequest(Exception e) {
         if (e instanceof MethodArgumentNotValidException validationException) {
@@ -46,6 +52,22 @@ public class GlobalExceptionHandler {
                     .getFieldErrors()
                     .stream()
                     .map(this::formatFieldError)
+                    .toList();
+            ApiError body = ApiError
+                    .builder()
+                    .errors(errors)
+                    .message(errors.isEmpty() ? "Validation failed" : errors.getFirst())
+                    .reason("Incorrectly made request.")
+                    .status(HttpStatus.BAD_REQUEST.name())
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        }
+
+        if (e instanceof HandlerMethodValidationException validationException) {
+            List<String> errors = validationException.getAllErrors()
+                    .stream()
+                    .map(error -> error.getDefaultMessage() == null ? error.toString() : error.getDefaultMessage())
                     .toList();
             ApiError body = ApiError
                     .builder()
