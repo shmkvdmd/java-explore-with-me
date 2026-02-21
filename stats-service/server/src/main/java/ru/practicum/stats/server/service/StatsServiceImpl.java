@@ -3,6 +3,8 @@ package ru.practicum.stats.server.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.stats.dto.EndpointHitDto;
 import ru.practicum.stats.dto.ViewStatsDto;
 import ru.practicum.stats.server.mapper.HitMapper;
@@ -29,7 +31,7 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean isUnique) {
         if (start.isAfter(end)) {
-            throw new IllegalArgumentException("Start must be before end");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start must be before end");
         }
 
         if (isUnique) {
