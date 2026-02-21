@@ -81,7 +81,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru.practicum.StatsServerApplication</mainClass>
+                    <mainClass>ru.practicum.MainServiceApplication</mainClass>
                     <layout>JAR</layout>
                 </configuration>
             </plugin>

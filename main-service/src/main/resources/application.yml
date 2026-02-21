@@ -18,12 +18,12 @@ spring:
       date-time: yyyy-MM-dd HH:mm:ss
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:main-db}:${DB_PORT:5432}/${DB_NAME:main}}
-    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:main}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:main}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:ewm-db}:${DB_PORT:5432}/${DB_NAME:ewm-server}}
+    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:postgres}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:postgres}}
 
 stats-server:
-  url: ${STATS_SERVER_URL:http://stats-server:9090}
+  url: ${STATS_SERVER_URL:http://ewm-stats-server:9090}
 
 management:
   endpoint:
