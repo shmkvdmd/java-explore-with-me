@@ -1,5 +1,5 @@
 services:
-  main-service:
+  ewm-service:
     build:
       context: ./main-service
       dockerfile: Dockerfile
