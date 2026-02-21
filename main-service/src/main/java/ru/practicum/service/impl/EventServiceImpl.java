@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -127,6 +128,10 @@ public class EventServiceImpl implements EventService {
         List<Long> userFilter = normalizeLongFilter(users, -1L);
         List<EventState> stateFilter = normalizeStateFilter(states, EventState.PENDING);
         List<Long> categoryFilter = normalizeLongFilter(categories, -1L);
+        boolean rangeStartEmpty = rangeStart == null;
+        boolean rangeEndEmpty = rangeEnd == null;
+        LocalDateTime safeRangeStart = rangeStartEmpty ? LocalDateTime.of(1970, 1, 1, 0, 0) : rangeStart;
+        LocalDateTime safeRangeEnd = rangeEndEmpty ? LocalDateTime.of(3000, 1, 1, 0, 0) : rangeEnd;
         List<Event> events = eventRepository
                 .searchAdminEvents(
                         userFilter,
@@ -135,8 +140,10 @@ public class EventServiceImpl implements EventService {
                         states == null || states.isEmpty(),
                         categoryFilter,
                         categories == null || categories.isEmpty(),
-                        rangeStart,
-                        rangeEnd,
+                        rangeStartEmpty,
+                        safeRangeStart,
+                        rangeEndEmpty,
+                        safeRangeEnd,
                         toPageable(from, size, null))
                 .toList();
         enrichEvents(events);
@@ -194,16 +201,26 @@ public class EventServiceImpl implements EventService {
 
         eventStatsService.saveHit(uri, ip);
         List<Long> categoryFilter = normalizeLongFilter(categories, -1L);
+        boolean textEmpty = text == null || text.isBlank();
+        String textPattern = textEmpty ? "" : "%" + text.toLowerCase(Locale.ROOT) + "%";
+        boolean rangeStartEmpty = rangeStart == null;
+        boolean rangeEndEmpty = rangeEnd == null;
+        LocalDateTime safeRangeStart = rangeStartEmpty ? LocalDateTime.of(1970, 1, 1, 0, 0) : rangeStart;
+        LocalDateTime safeRangeEnd = rangeEndEmpty ? LocalDateTime.of(3000, 1, 1, 0, 0) : rangeEnd;
+
         List<Event> events;
         boolean requiresMemoryProcessing = Boolean.TRUE.equals(onlyAvailable) || sort == EventSort.VIEWS;
         if (requiresMemoryProcessing) {
             List<Event> allEvents = eventRepository.searchPublicEventsRaw(
-                    text,
+                    textEmpty,
+                    textPattern,
                     categoryFilter,
                     categories == null || categories.isEmpty(),
                     paid,
-                    rangeStart,
-                    rangeEnd
+                    rangeStartEmpty,
+                    safeRangeStart,
+                    rangeEndEmpty,
+                    safeRangeEnd
             );
             enrichEvents(allEvents);
             events = allEvents
@@ -218,12 +235,15 @@ public class EventServiceImpl implements EventService {
                     ? toPageable(from, size, Sort.by(Sort.Direction.ASC, "eventDate"))
                     : toPageable(from, size, null);
             events = eventRepository.searchPublicEvents(
-                            text,
+                            textEmpty,
+                            textPattern,
                             categoryFilter,
                             categories == null || categories.isEmpty(),
                             paid,
-                            rangeStart,
-                            rangeEnd,
+                            rangeStartEmpty,
+                            safeRangeStart,
+                            rangeEndEmpty,
+                            safeRangeEnd,
                             pageable)
                     .toList();
             enrichEvents(events);

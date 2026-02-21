@@ -27,8 +27,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             where (:usersEmpty = true or e.initiator.id in :users)
               and (:statesEmpty = true or e.state in :states)
               and (:categoriesEmpty = true or e.category.id in :categories)
-              and (:rangeStart is null or e.eventDate >= :rangeStart)
-              and (:rangeEnd is null or e.eventDate <= :rangeEnd)
+              and (:rangeStartEmpty = true or e.eventDate >= :rangeStart)
+              and (:rangeEndEmpty = true or e.eventDate <= :rangeEnd)
             """)
     Page<Event> searchAdminEvents(@Param("users") List<Long> users,
                                   @Param("usersEmpty") boolean usersEmpty,
@@ -36,44 +36,52 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                   @Param("statesEmpty") boolean statesEmpty,
                                   @Param("categories") List<Long> categories,
                                   @Param("categoriesEmpty") boolean categoriesEmpty,
+                                  @Param("rangeStartEmpty") boolean rangeStartEmpty,
                                   @Param("rangeStart") LocalDateTime rangeStart,
+                                  @Param("rangeEndEmpty") boolean rangeEndEmpty,
                                   @Param("rangeEnd") LocalDateTime rangeEnd,
                                   Pageable pageable);
 
     @Query("""
             select e from Event e
             where e.state = ru.practicum.enums.EventState.PUBLISHED
-              and (:text is null
-                   or lower(e.annotation) like lower(concat('%', :text, '%'))
-                   or lower(e.description) like lower(concat('%', :text, '%')))
+              and (:textEmpty = true
+                   or lower(e.annotation) like :textPattern
+                   or lower(e.description) like :textPattern)
               and (:categoriesEmpty = true or e.category.id in :categories)
               and (:paid is null or e.paid = :paid)
-              and (:rangeStart is null or e.eventDate >= :rangeStart)
-              and (:rangeEnd is null or e.eventDate <= :rangeEnd)
+              and (:rangeStartEmpty = true or e.eventDate >= :rangeStart)
+              and (:rangeEndEmpty = true or e.eventDate <= :rangeEnd)
             """)
-    Page<Event> searchPublicEvents(@Param("text") String text,
+    Page<Event> searchPublicEvents(@Param("textEmpty") boolean textEmpty,
+                                   @Param("textPattern") String textPattern,
                                    @Param("categories") List<Long> categories,
                                    @Param("categoriesEmpty") boolean categoriesEmpty,
                                    @Param("paid") Boolean paid,
+                                   @Param("rangeStartEmpty") boolean rangeStartEmpty,
                                    @Param("rangeStart") LocalDateTime rangeStart,
+                                   @Param("rangeEndEmpty") boolean rangeEndEmpty,
                                    @Param("rangeEnd") LocalDateTime rangeEnd,
                                    Pageable pageable);
 
     @Query("""
             select e from Event e
             where e.state = ru.practicum.enums.EventState.PUBLISHED
-              and (:text is null
-                   or lower(e.annotation) like lower(concat('%', :text, '%'))
-                   or lower(e.description) like lower(concat('%', :text, '%')))
+              and (:textEmpty = true
+                   or lower(e.annotation) like :textPattern
+                   or lower(e.description) like :textPattern)
               and (:categoriesEmpty = true or e.category.id in :categories)
               and (:paid is null or e.paid = :paid)
-              and (:rangeStart is null or e.eventDate >= :rangeStart)
-              and (:rangeEnd is null or e.eventDate <= :rangeEnd)
+              and (:rangeStartEmpty = true or e.eventDate >= :rangeStart)
+              and (:rangeEndEmpty = true or e.eventDate <= :rangeEnd)
             """)
-    List<Event> searchPublicEventsRaw(@Param("text") String text,
+    List<Event> searchPublicEventsRaw(@Param("textEmpty") boolean textEmpty,
+                                      @Param("textPattern") String textPattern,
                                       @Param("categories") List<Long> categories,
                                       @Param("categoriesEmpty") boolean categoriesEmpty,
                                       @Param("paid") Boolean paid,
+                                      @Param("rangeStartEmpty") boolean rangeStartEmpty,
                                       @Param("rangeStart") LocalDateTime rangeStart,
+                                      @Param("rangeEndEmpty") boolean rangeEndEmpty,
                                       @Param("rangeEnd") LocalDateTime rangeEnd);
 }
