@@ -1,3 +1,5 @@
+version: '3.1'
+
 services:
   stats-db:
     image: postgres:15.1-alpine
@@ -55,7 +57,6 @@ services:
       retries: 5
 
   ewm-service:
-    restart: on-failure
     build: ./main-service
     image: ewm-service-image
     container_name: ewm-service
