@@ -28,12 +28,18 @@ stats-server:
 management:
   endpoint:
     health:
+      show-details: always
       probes:
         enabled: true
   endpoints:
     web:
       exposure:
         include: health
+  health:
+    defaults:
+      enabled: false
+    ping:
+      enabled: true
 
 ---
 spring:

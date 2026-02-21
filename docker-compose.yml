@@ -1,6 +1,7 @@
 services:
   ewm-service:
     restart: on-failure
+    pull_policy: never
     build:
       context: ./main-service
       dockerfile: Dockerfile
@@ -30,6 +31,7 @@ services:
 
   stats-server:
     restart: on-failure
+    pull_policy: never
     build:
       context: ./stats-service/server
       dockerfile: Dockerfile
