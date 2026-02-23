@@ -1,15 +1,13 @@
-package ru.practicum.dto;
+package ru.practicum.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record CategoryDto(
-        Long id,
-
+public record NewCommentDto(
         @NotBlank
-        @Size(min = 1, max = 50)
-        String name
+        @Size(min = 20, max = 250)
+        String text
 ) {
 }

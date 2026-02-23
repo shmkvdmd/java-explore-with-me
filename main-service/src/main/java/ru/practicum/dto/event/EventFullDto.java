@@ -1,14 +1,18 @@
-package ru.practicum.dto;
+package ru.practicum.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import ru.practicum.dto.category.CategoryDto;
+import ru.practicum.dto.location.LocationDto;
+import ru.practicum.dto.user.UserShortDto;
+import ru.practicum.enums.EventState;
 
 import java.time.LocalDateTime;
 
 @Builder
-public record EventShortDto(
+public record EventFullDto(
         @NotBlank
         String annotation,
 
@@ -16,6 +20,11 @@ public record EventShortDto(
         CategoryDto category,
 
         Long confirmedRequests,
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime createdOn,
+
+        String description,
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         @NotNull
@@ -27,7 +36,19 @@ public record EventShortDto(
         UserShortDto initiator,
 
         @NotNull
+        LocationDto location,
+
+        @NotNull
         Boolean paid,
+
+        Integer participantLimit,
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime publishedOn,
+
+        Boolean requestModeration,
+
+        EventState state,
 
         @NotBlank
         String title,
