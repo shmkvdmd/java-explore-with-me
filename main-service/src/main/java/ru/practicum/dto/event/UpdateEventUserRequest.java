@@ -1,4 +1,4 @@
-package ru.practicum.dto;
+package ru.practicum.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
@@ -6,12 +6,13 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import ru.practicum.enums.AdminStateAction;
+import ru.practicum.dto.location.LocationDto;
+import ru.practicum.enums.UserStateAction;
 
 import java.time.LocalDateTime;
 
 @Builder
-public record UpdateEventAdminRequest(
+public record UpdateEventUserRequest(
         @Size(min = 20, max = 2000)
         String annotation,
 
@@ -34,7 +35,7 @@ public record UpdateEventAdminRequest(
 
         Boolean requestModeration,
 
-        AdminStateAction stateAction,
+        UserStateAction stateAction,
 
         @Size(min = 3, max = 120)
         String title
